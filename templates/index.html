@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produits</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+        .error-details {
+            font-family: monospace;
+            background-color: #f8d7da;
+            padding: 10px;
+            border: 1px solid red;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Liste des Produits</h1>
+
+    <div class="product-container" id="products-container"></div>
+
+    <h2>Passer une commande</h2>
+    <form id="orderForm">
+        <label for="productId">ID du Produit :</label>
+        <input type="number" id="productId" name="productId" required>
+
+        <label for="quantity">Quantité :</label>
+        <input type="number" id="quantity" name="quantity" min="1" required>
+
+        <button type="submit">Commander</button>
+    </form>
+
+    <div id="orderResponse"></div>
+
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch('/products');
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la récupération des produits');
+                }
+                const data = await response.json();
+                displayProducts(data.products);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img src="http://dimensweb.uqac.ca/~jgnault/shops/images/${product.image}" alt="${product.name}">
+                    <h2>${product.name}</h2>
+                    <p>Prix: ${product.price / 100} €</p>
+                    <p>En stock: ${product.in_stock ? 'Oui' : 'Non'}</p>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const productId = document.getElementById('productId').value;
+            const quantity = document.getElementById('quantity').value;
+
+            try {
+                const response = await fetch('/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product: { id: parseInt(productId), quantity: parseInt(quantity) } })
+                });
+
+                const result = await response.json();
+                const orderResponse = document.getElementById('orderResponse');
+                orderResponse.innerHTML = ''; // Réinitialiser le contenu précédent
+
+                if (response.ok) {
+                    orderResponse.innerHTML = `<div class="success-message">✅ Commande réussie ! ID: ${result.order_id}</div>`;
+                } else {
+                    // Gestion des erreurs avec format d'affichage approprié
+                    if (result.errors && result.errors.product) {
+                        const errorMessage = result.errors.product.name || "Erreur inconnue";
+                        orderResponse.innerHTML = `<div class="error-message">❌ Erreur : ${errorMessage}</div>`;
+                        orderResponse.innerHTML += `<div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>`;
+                    } else {
+                        orderResponse.innerHTML = `<div class="error-message">❌ Erreur inconnue</div>`;
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('orderResponse').innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
+            }
+        });
+
+        loadProducts();
+    </script>
+</body>
+</html>
