@@ -3,41 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produits</title>
+    <title>Produits & Commandes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-        .success-message {
-            color: green;
-            margin-top: 10px;
-        }
-        .error-details {
-            font-family: monospace;
-            background-color: #f8d7da;
-            padding: 10px;
-            border: 1px solid red;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
+        .error-message { color: red; margin-top: 10px; }
+        .success-message { color: green; margin-top: 10px; }
+        .error-details { font-family: monospace; background-color: #f8d7da; padding: 10px; border: 1px solid red; border-radius: 5px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Liste des Produits</h1>
-
-    <div class="product-container" id="products-container"></div>
+    <!--<h1>Liste des Produits</h1>
+    <div class="product-container" id="products-container"></div>-->
 
     <h2>Passer une commande</h2>
     <form id="orderForm">
         <label for="productId">ID du Produit :</label>
-        <input type="number" id="productId" name="productId" required>
+        <input type="number" id="productId" name="productId" >
 
         <label for="quantity">Quantité :</label>
-        <input type="number" id="quantity" name="quantity" min="1" required>
+        <input type="number" id="quantity" name="quantity" min="1" >
 
         <button type="submit">Commander</button>
+    </form>
+
+    <h2>Ajouter les informations de livraison</h2>
+    <form id="updateOrderForm">
+        <label for="orderId">ID de la commande :</label>
+        <input type="number" id="orderId" name="orderId" required>
+
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="country">Pays :</label>
+        <input type="text" id="country" name="country" required>
+
+        <label for="address">Adresse :</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="postal_code">Code Postal :</label>
+        <input type="text" id="postal_code" name="postal_code" required>
+
+        <label for="city">Ville :</label>
+        <input type="text" id="city" name="city" required>
+
+        <label for="province">Province :</label>
+        <select id="province" name="province" required>
+            <option value="">-- Sélectionnez une province --</option>
+            <option value="QC">Québec (QC) - 15%</option>
+            <option value="ON">Ontario (ON) - 13%</option>
+            <option value="AB">Alberta (AB) - 5%</option>
+            <option value="BC">Colombie-Britannique (BC) - 12%</option>
+            <option value="NS">Nouvelle-Écosse (NS) - 14%</option>
+        </select>
+
+        <button type="submit">Mettre à jour la commande</button>
     </form>
 
     <div id="orderResponse"></div>
@@ -58,13 +77,22 @@
 
         function displayProducts(products) {
             const container = document.getElementById('products-container');
+            const productSelect = document.getElementById('productId'); // Dropdown for products
+
             products.forEach(product => {
+                // Add products to the dropdown
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ${product.price / 100} €`;
+                productSelect.appendChild(option);
+
+                // Display product cards
                 const productCard = document.createElement('div');
                 productCard.classList.add('product-card');
                 productCard.innerHTML = `
                     <img src="http://dimensweb.uqac.ca/~jgnault/shops/images/${product.image}" alt="${product.name}">
                     <h2>${product.name}</h2>
-                    <p>Prix: ${product.price / 100} €</p>
+                    <p>Prix: ${(product.price / 100).toFixed(2)} €</p>
                     <p>En stock: ${product.in_stock ? 'Oui' : 'Non'}</p>
                 `;
                 container.appendChild(productCard);
@@ -73,9 +101,11 @@
 
         document.getElementById('orderForm').addEventListener('submit', async function(event) {
             event.preventDefault();
-
             const productId = document.getElementById('productId').value;
             const quantity = document.getElementById('quantity').value;
+            const orderResponse = document.getElementById('orderResponse');
+
+            orderResponse.innerHTML = ''; // Reset message
 
             try {
                 const response = await fetch('/order', {
@@ -85,24 +115,65 @@
                 });
 
                 const result = await response.json();
-                const orderResponse = document.getElementById('orderResponse');
-                orderResponse.innerHTML = ''; // Réinitialiser le contenu précédent
 
                 if (response.ok) {
-                    orderResponse.innerHTML = `<div class="success-message">✅ Commande réussie ! ID: ${result.order_id}</div>`;
+                    orderResponse.innerHTML = `<div class="success-message">✅ Commande créée avec ID: ${result.order_id}</div>`;
                 } else {
-                    // Gestion des erreurs avec format d'affichage approprié
-                    if (result.errors && result.errors.product) {
-                        const errorMessage = result.errors.product.name || "Erreur inconnue";
-                        orderResponse.innerHTML = `<div class="error-message">❌ Erreur : ${errorMessage}</div>`;
-                        orderResponse.innerHTML += `<div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>`;
-                    } else {
-                        orderResponse.innerHTML = `<div class="error-message">❌ Erreur inconnue</div>`;
-                    }
+                    orderResponse.innerHTML = `
+                        <div class="error-message">❌ ${result.errors?.product?.name || "Erreur inconnue"}</div>
+                        <div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>
+                    `;
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById('orderResponse').innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
+                orderResponse.innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
+            }
+        });
+
+        document.getElementById('updateOrderForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const orderId = document.getElementById('orderId').value;
+            const email = document.getElementById('email').value;
+            const country = document.getElementById('country').value;
+            const address = document.getElementById('address').value;
+            const postalCode = document.getElementById('postal_code').value;
+            const city = document.getElementById('city').value;
+            const province = document.getElementById('province').value;
+            const orderResponse = document.getElementById('orderResponse');
+
+            orderResponse.innerHTML = ''; // Reset message
+
+            try {
+                const response = await fetch(`/order/${orderId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        order: {
+                            email: email,
+                            shipping_information: {
+                                country: country,
+                                address: address,
+                                postal_code: postalCode,
+                                city: city,
+                                province: province
+                            }
+                        }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    orderResponse.innerHTML = `<div class="success-message">✅ Commande mise à jour avec succès</div>`;
+                } else {
+                    orderResponse.innerHTML = `
+                        <div class="error-message">❌ ${result.errors?.order?.name || "Erreur inconnue"}</div>
+                        <div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                orderResponse.innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
             }
         });
 

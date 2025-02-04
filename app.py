@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for
 from peewee import Model, CharField, IntegerField, BooleanField, SqliteDatabase
 import requests
 
@@ -53,6 +53,15 @@ def init_db():
 
 init_db()
 
+def calculate_shipping_price(weight):
+    """Calcule le prix d'expédition en fonction du poids total."""
+    if weight <= 500:
+        return 500  # 5$
+    elif weight < 2000:
+        return 1000  # 10$
+    else:
+        return 2500  # 25$
+
 @app.route("/")
 def index():
     products = Product.select()
@@ -65,34 +74,50 @@ def get_products():
 @app.route("/order", methods=["POST"])
 def create_order():
     data = request.get_json()
-    
-    # Vérification des champs obligatoires
-    if not data or "product" not in data or "id" not in data["product"] or "quantity" not in data["product"]:
-        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "Un produit est requis."}}}), 422
 
-    product_id = data["product"]["id"]
-    quantity = data["product"]["quantity"]
+    # Vérifier que l'objet "product" existe
+    if not data or "product" not in data:
+        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "La création d'une commande nécessite un produit"}}}), 422
+
+    product = data["product"]
+
+    # Vérifier que le produit existe et s'il manque l'objet product
+    product_id = product["id"]
+    product_obj = Product.get_or_none(Product.id == product_id)
+    if not product_obj:
+        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "La création d'une commande nécessite un produit"}}}), 422
     
-    # Vérification de la validité de la quantité
+    # Vérifier que quantity est bien un entier valide et qu'il contient le champs quantity
+    try:
+        quantity = int(product["quantity"])
+    except (ValueError, TypeError):
+        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "Un produit doit contenir une quantité"}}}), 422
+
+    # Vérifier que la quantité est >= 1
     if quantity < 1:
-        return jsonify({"errors": {"product": {"code": "invalid-quantity", "name": "Quantité invalide."}}}), 422
+        return jsonify({"errors": {"product": {"code": "invalid-quantity", "name": "Quantité invalide. Doit être supérieure ou égale à 1."}}}), 422
 
-    # Vérification de l'existence du produit
-    product = Product.get_or_none(Product.id == product_id)
-    if not product:
-        return jsonify({"errors": {"product": {"code": "not-found", "name": "Produit introuvable."}}}), 422
+    # Vérifier que le produit est en stock
+    if not product_obj.in_stock:
+        return jsonify({"errors": {"product": {"code": "out-of-inventory", "name": "Le produit demandé n'est pas en inventaire"}}}), 422
 
-    # Vérification de l'inventaire
-    if not product.in_stock:
-        return jsonify({"errors": {"product": {"code": "out-of-inventory", "name": "Le produit est en rupture de stock."}}}), 422
+    # Calculer le prix total et le poids total
+    total_price = product_obj.price * quantity
+    total_weight = product_obj.weight * quantity
 
-    # Calcul du prix total
-    total_price = product.price * quantity
+    # Calculer le prix de livraison
+    shipping_price = calculate_shipping_price(total_weight)
 
-    # Création de la commande
-    order = Order.create(product_id=product_id, quantity=quantity, total_price=total_price)
+    # Créer la commande
+    order = Order.create(
+        product_id=product_id,
+        quantity=quantity,
+        total_price=total_price,
+        shipping_price=shipping_price
+    )
 
-    return jsonify({"order_id": order.id}), 302
+    # Retourner un code 302 avec la redirection vers la commande créée
+    return redirect(url_for("get_order", order_id=order.id), code=302)
 
 @app.route("/order/<int:order_id>", methods=["GET"])
 def get_order(order_id):
@@ -105,23 +130,52 @@ def get_order(order_id):
 def update_order(order_id):
     data = request.get_json()
     order = Order.get_or_none(Order.id == order_id)
+
+    # Vérifier si la commande existe
     if not order:
-        return jsonify({"errors": {"order": {"code": "missing-fields", "name": "Commande introuvable."}}}), 404
+        return jsonify({"errors": {"order": {"code": "not-found", "name": "Commande introuvable."}}}), 404
     
+    # Vérifier si les champs obligatoires sont présents
     if "order" not in data or "email" not in data["order"] or "shipping_information" not in data["order"]:
-        return jsonify({"errors": {"order": {"code": "missing-fields", "name": "Champs obligatoires manquants."}}}), 422
+        return jsonify({"errors": {"order": {"code": "missing-fields", "name": "Il manque un ou plusieurs champs obligatoires."}}}), 422
     
+    shipping_info = data["order"]["shipping_information"]
+    required_fields = ["country", "address", "postal_code", "city", "province"]
+    
+    if not all(field in shipping_info for field in required_fields):
+        return jsonify({"errors": {"order": {"code": "missing-fields", "name": "Il manque un ou plusieurs champs dans l'adresse de livraison."}}}), 422
+    
+    # Mettre à jour l'email et l'adresse de livraison
     order.email = data["order"]["email"]
-    order.shipping_information = str(data["order"]["shipping_information"])
+    order.shipping_information = str(shipping_info)
+
+    # Déterminer la taxe en fonction de la province
+    TAX_RATES = {
+        "QC": 0.15,  # Québec 15%
+        "ON": 0.13,  # Ontario 13%
+        "AB": 0.05,  # Alberta 5%
+        "BC": 0.12,  # Colombie-Britannique 12%
+        "NS": 0.14   # Nouvelle-Écosse 14%
+    }
+    
+    province = shipping_info["province"]
+    tax_rate = TAX_RATES.get(province, 0)  # Default to 0 if province is not in the list
+
+    # Calcul du total avec taxes
+    order.total_price_tax = int(order.total_price * (1 + tax_rate))
+
+    # Sauvegarde des modifications
     order.save()
-    return jsonify({"order": order.__data__})
+    
+    return jsonify({"order": order.__data__}), 200
+
 
 @app.route("/order/<int:order_id>/pay", methods=["PUT"])
 def pay_order(order_id):
     data = request.get_json()
     order = Order.get_or_none(Order.id == order_id)
     if not order:
-        return jsonify({"errors": {"order": {"code": "not-found", "name": "Commande introuvable."}}}), 404
+        return jsonify({"errors": {"order": {"code": "not-founde", "name": "Commande introuvable."}}}), 404
     
     if not order.email or not order.shipping_information:
         return jsonify({"errors": {"order": {"code": "missing-fields", "name": "Informations client requises."}}}), 422
