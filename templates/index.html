@@ -3,181 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produits & Commandes</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Boutique en ligne</title>
     <style>
-        .error-message { color: red; margin-top: 10px; }
-        .success-message { color: green; margin-top: 10px; }
-        .error-details { font-family: monospace; background-color: #f8d7da; padding: 10px; border: 1px solid red; border-radius: 5px; margin-top: 10px; }
+        /* Styles existants */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        input, select { width: 100%; padding: 8px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .error { color: #dc3545; margin-top: 5px; }
+        .success { color: #28a745; margin-top: 5px; }
+        .expiry-cvv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     </style>
 </head>
 <body>
-    <!--<h1>Liste des Produits</h1>
-    <div class="product-container" id="products-container"></div>-->
-
-    <h2>Passer une commande</h2>
+    <h1>Passer une commande</h1>
+    
+    <!-- Formulaire de commande -->
     <form id="orderForm">
-        <label for="productId">ID du Produit :</label>
-        <input type="number" id="productId" name="productId" >
-
-        <label for="quantity">Quantité :</label>
-        <input type="number" id="quantity" name="quantity" min="1" >
-
-        <button type="submit">Commander</button>
+        <h2>Nouvelle commande</h2>
+        <label>ID Produit: <input type="number" id="productId" required></label>
+        <label>Quantité: <input type="number" id="quantity" min="1" required></label>
+        <button type="submit">Créer commande</button>
     </form>
 
-    <h2>Ajouter les informations de livraison</h2>
-    <form id="updateOrderForm">
-        <label for="orderId">ID de la commande :</label>
-        <input type="number" id="orderId" name="orderId" required>
+    <!-- Formulaire de mise à jour -->
+    <form id="updateForm">
+        <h2>Mettre à jour la commande</h2>
+        <label>ID Commande: <input type="number" id="orderId" required></label>
+        
+        <h3>Informations client</h3>
+        <label>Email: <input type="email" id="email" required></label>
+        <label>Pays: <input type="text" id="country" required></label>
+        <label>Adresse: <input type="text" id="address" required></label>
+        <label>Code postal: <input type="text" id="postalCode" required></label>
+        <label>Ville: <input type="text" id="city" required></label>
+        <label>Province: 
+            <select id="province" required>
+                <option value="QC">Québec</option>
+                <option value="ON">Ontario</option>
+                <option value="AB">Alberta</option>
+                <option value="BC">Colombie-Britannique</option>
+                <option value="NS">Nouvelle-Écosse</option>
+            </select>
+        </label>
 
-        <label for="email">Email :</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="country">Pays :</label>
-        <input type="text" id="country" name="country" required>
-
-        <label for="address">Adresse :</label>
-        <input type="text" id="address" name="address" required>
-
-        <label for="postal_code">Code Postal :</label>
-        <input type="text" id="postal_code" name="postal_code" required>
-
-        <label for="city">Ville :</label>
-        <input type="text" id="city" name="city" required>
-
-        <label for="province">Province :</label>
-        <select id="province" name="province" required>
-            <option value="">-- Sélectionnez une province --</option>
-            <option value="QC">Québec (QC) - 15%</option>
-            <option value="ON">Ontario (ON) - 13%</option>
-            <option value="AB">Alberta (AB) - 5%</option>
-            <option value="BC">Colombie-Britannique (BC) - 12%</option>
-            <option value="NS">Nouvelle-Écosse (NS) - 14%</option>
-        </select>
-
-        <button type="submit">Mettre à jour la commande</button>
+        <h3>Paiement</h3>
+        <label>Nom sur la carte: <input type="text" id="cardName" required></label>
+        <label>Numéro de carte: <input type="text" id="cardNumber" 
+               pattern="\d{4} \d{4} \d{4} \d{4}" 
+               placeholder="4242 4242 4242 4242" required></label>
+        <div class="expiry-cvv">
+            <div>
+                <label>Année expiration: 
+                    <select id="expYear" required>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>CVV: <input type="text" id="cvv" pattern="\d{3}" required></label>
+            </div>
+            <div>
+                <label>Mois expiration: 
+                    <select id="expMonth" required>
+                        <option value="1">01</option>
+                        <option value="2">02</option>
+                        <option value="3">03</option>
+                        <option value="4">04</option>
+                        <option value="5">05</option>
+                        <option value="6">06</option>
+                        <option value="7">07</option>
+                        <option value="8">08</option>
+                        <option value="9">09</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        
+        <button type="submit">Mettre à jour et payer</button>
     </form>
 
-    <div id="orderResponse"></div>
+    <div id="response"></div>
 
     <script>
-        async function loadProducts() {
-            try {
-                const response = await fetch('/products');
-                if (!response.ok) {
-                    throw new Error('Erreur lors de la récupération des produits');
-                }
-                const data = await response.json();
-                displayProducts(data.products);
-            } catch (error) {
-                console.error(error);
-            }
-        }
+        // Formatage automatique du numéro de carte
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/ /g, '');
+            if(value.length > 16) value = value.substr(0, 16);
+            e.target.value = value.match(/.{1,4}/g)?.join(' ') || '';
+        });
 
-        function displayProducts(products) {
-            const container = document.getElementById('products-container');
-            const productSelect = document.getElementById('productId'); // Dropdown for products
-
-            products.forEach(product => {
-                // Add products to the dropdown
-                const option = document.createElement('option');
-                option.value = product.id;
-                option.textContent = `${product.name} - ${product.price / 100} €`;
-                productSelect.appendChild(option);
-
-                // Display product cards
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <img src="http://dimensweb.uqac.ca/~jgnault/shops/images/${product.image}" alt="${product.name}">
-                    <h2>${product.name}</h2>
-                    <p>Prix: ${(product.price / 100).toFixed(2)} €</p>
-                    <p>En stock: ${product.in_stock ? 'Oui' : 'Non'}</p>
-                `;
-                container.appendChild(productCard);
+        // Gestion des formulaires
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const response = await fetch('/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    product: {
+                        id: parseInt(document.getElementById('productId').value),
+                        quantity: parseInt(document.getElementById('quantity').value)
+                    }
+                })
             });
-        }
-
-        document.getElementById('orderForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productId = document.getElementById('productId').value;
-            const quantity = document.getElementById('quantity').value;
-            const orderResponse = document.getElementById('orderResponse');
-
-            orderResponse.innerHTML = ''; // Reset message
-
-            try {
-                const response = await fetch('/order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product: { id: parseInt(productId), quantity: parseInt(quantity) } })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    orderResponse.innerHTML = `<div class="success-message">✅ Commande créée avec ID: ${result.order_id}</div>`;
-                } else {
-                    orderResponse.innerHTML = `
-                        <div class="error-message">❌ ${result.errors?.product?.name || "Erreur inconnue"}</div>
-                        <div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>
-                    `;
-                }
-            } catch (error) {
-                console.error(error);
-                orderResponse.innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
-            }
+            handleResponse(await response.json());
         });
 
-        document.getElementById('updateOrderForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             const orderId = document.getElementById('orderId').value;
-            const email = document.getElementById('email').value;
-            const country = document.getElementById('country').value;
-            const address = document.getElementById('address').value;
-            const postalCode = document.getElementById('postal_code').value;
-            const city = document.getElementById('city').value;
-            const province = document.getElementById('province').value;
-            const orderResponse = document.getElementById('orderResponse');
-
-            orderResponse.innerHTML = ''; // Reset message
-
-            try {
-                const response = await fetch(`/order/${orderId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        order: {
-                            email: email,
-                            shipping_information: {
-                                country: country,
-                                address: address,
-                                postal_code: postalCode,
-                                city: city,
-                                province: province
-                            }
+            const response = await fetch(`/order/${orderId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    order: {
+                        email: document.getElementById('email').value,
+                        shipping_information: {
+                            country: document.getElementById('country').value,
+                            address: document.getElementById('address').value,
+                            postal_code: document.getElementById('postalCode').value,
+                            city: document.getElementById('city').value,
+                            province: document.getElementById('province').value
                         }
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    orderResponse.innerHTML = `<div class="success-message">✅ Commande mise à jour avec succès</div>`;
-                } else {
-                    orderResponse.innerHTML = `
-                        <div class="error-message">❌ ${result.errors?.order?.name || "Erreur inconnue"}</div>
-                        <div class="error-details">${JSON.stringify(result.errors, null, 2)}</div>
-                    `;
-                }
-            } catch (error) {
-                console.error(error);
-                orderResponse.innerHTML = `<div class="error-message">❌ Erreur de connexion au serveur.</div>`;
-            }
+                    },
+                    credit_card: {
+                        name: document.getElementById('cardName').value,
+                        number: document.getElementById('cardNumber').value.replace(/ /g, ''),
+                        expiration_month: parseInt(document.getElementById('expMonth').value),
+                        expiration_year: parseInt(document.getElementById('expYear').value),
+                        cvv: document.getElementById('cvv').value
+                    }
+                })
+            });
+            handleResponse(await response.json());
         });
 
-        loadProducts();
+        function handleResponse(data) {
+            const div = document.getElementById('response');
+            if(data.errors) {
+                div.innerHTML = `<div class="error">Erreur: ${JSON.stringify(data.errors)}</div>`;
+            } else {
+                div.innerHTML = `<div class="success">Succès: ${JSON.stringify(data.order, null, 2)}</div>`;
+            }
+        }
     </script>
 </body>
 </html>

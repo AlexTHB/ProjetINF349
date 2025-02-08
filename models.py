@@ -1,6 +1,5 @@
-from peewee import Model, CharField, BooleanField, IntegerField, TextField, SqliteDatabase
+from peewee import *
 
-# Configuration de la base de données
 db = SqliteDatabase('database.db')
 
 class BaseModel(Model):
@@ -8,27 +7,31 @@ class BaseModel(Model):
         database = db
 
 class Product(BaseModel):
-    id = IntegerField(primary_key=True)  # ID unique requis par l'API
+    id = IntegerField(primary_key=True)
     name = CharField()
-    description = CharField()
-    price = IntegerField()  # Stocker le prix en centimes (ex: 28.1€ = 2810)
+    description = TextField()
+    price = FloatField()
     weight = IntegerField()
     in_stock = BooleanField()
     image = CharField()
 
 class Order(BaseModel):
-    id = IntegerField(primary_key=True)
+    id = AutoField()
     product_id = IntegerField()
     quantity = IntegerField()
     email = CharField(null=True)
-    shipping_information = TextField(null=True)  # JSON stocké sous forme de texte
-    total_price = IntegerField()  # Prix total en centimes
-    total_price_tax = IntegerField(null=True)
-    shipping_price = IntegerField(null=True)
+    shipping_information = TextField(null=True)
+    total_price = FloatField()
+    total_price_tax = FloatField(null=True)
+    shipping_price = FloatField()
     paid = BooleanField(default=False)
-    transaction_id = CharField(null=True)  # Stocker l'ID de transaction après paiement
+    transaction_id = CharField(null=True)
+    credit_card_name = CharField(null=True)
+    credit_card_first_digits = CharField(null=True)
+    credit_card_last_digits = CharField(null=True)
+    credit_card_expiration_year = IntegerField(null=True)
+    credit_card_expiration_month = IntegerField(null=True)
 
-# Initialisation de la base de données
 def initialize_db():
     db.connect()
     db.create_tables([Product, Order], safe=True)
