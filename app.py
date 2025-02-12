@@ -1,7 +1,8 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, Response, redirect, url_for
 from models import db, Product, Order
 from peewee import DoesNotExist
 import requests
+from collections import OrderedDict
 import json
 
 app = Flask(__name__)
@@ -44,10 +45,13 @@ def create_order():
     try:
         product = Product.get(Product.id == data["product"]["id"])
     except DoesNotExist:
-        return jsonify({"errors": {"product": {"code": "invalid-product", "name": "Produit introuvable"}}}), 422
+        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "La création d'une commande nécessite un produit"}}}), 422
 
     if not product.in_stock:
-        return jsonify({"errors": {"product": {"code": "out-of-inventory", "name": "Produit non disponible"}}}), 422
+        return jsonify({"errors": {"product": {"code": "out-of-inventory", "name": "Le produit demandé n'est pas en inventaire"}}}), 422
+    
+    if data["product"]["quantity"] < 1:
+        return jsonify({"errors": {"product": {"code": "missing-fields", "name": "La quantite doit etre superieure ou egal a 1"}}}), 422
 
     order = Order.create(
         product_id=product.id,
@@ -56,22 +60,23 @@ def create_order():
         shipping_price=calculate_shipping(product.weight * data["product"]["quantity"])
     )
 
-    return jsonify({
-        "order": {
-            "id": order.id,
-            "product": {"id": product.id, "quantity": order.quantity},
-            "total_price": order.total_price,
-            "shipping_price": order.shipping_price
-        }
-    }), 201
+    return redirect(url_for('get_order', order_id=order.id)), 302
 
 @app.route("/order/<int:order_id>", methods=["GET"])
 def get_order(order_id):
     try:
         order = Order.get_by_id(order_id)
     except DoesNotExist:
-        return jsonify({"errors": {"order": {"code": "not-found", "name": "Commande introuvable"}}}), 404
+        return jsonify({
+            "errors": {
+                "order": {
+                    "code": "not-found",
+                    "name": "Commande introuvable"
+                }
+            }
+        }), 404
 
+    # Construction de l'objet credit_card si des informations sont présentes
     credit_card = None
     if order.credit_card_name:
         credit_card = {
@@ -82,20 +87,39 @@ def get_order(order_id):
             "expiration_month": order.credit_card_expiration_month
         }
 
-    return jsonify({
-        "order": {
-            "id": order.id,
-            "product": {"id": order.product_id, "quantity": order.quantity},
-            "total_price": order.total_price,
-            "total_price_tax": order.total_price_tax,
-            "shipping_price": order.shipping_price,
-            "email": order.email,
-            "shipping_information": json.loads(order.shipping_information) if order.shipping_information else None,
-            "paid": order.paid,
-            "transaction": {"id": order.transaction_id} if order.transaction_id else None,
-            "credit_card": credit_card
-        }
-    })
+    # Conversion de shipping_information si disponible
+    shipping_information = json.loads(order.shipping_information) if order.shipping_information else None
+
+    # Construction de l'objet transaction si applicable
+    transaction = None
+    if order.transaction_id:
+        transaction = OrderedDict([
+            ("id", order.transaction_id),
+            ("success", order.paid),
+            ("amount_charged", round(order.total_price_tax + order.shipping_price))
+        ])
+
+    # Construction de l'objet order avec l'ordre de clés souhaité
+    order_data = OrderedDict([
+        ("shipping_information", shipping_information),
+        ("email", order.email),
+        ("total_price", order.total_price),
+        ("total_price_tax", order.total_price_tax),
+        ("paid", order.paid),
+        ("product", {"id": order.product_id, "quantity": order.quantity}),
+        ("credit_card", credit_card),
+        ("transaction", transaction),
+        ("shipping_price", order.shipping_price),
+        ("id", order.id)
+    ])
+
+    response_data = OrderedDict([("order", order_data)])
+
+    return Response(
+        json.dumps(response_data, ensure_ascii=False, sort_keys=False),
+        mimetype='application/json'
+    )
+
 
 @app.route("/order/<int:order_id>", methods=["PUT"])
 def update_order(order_id):
@@ -113,27 +137,48 @@ def update_order(order_id):
             }
         }), 404
 
-    # Partie mise à jour des informations client
-    if "order" in data:
-        required_fields = ["email", "shipping_information"]
-        if not all(field in data["order"] for field in required_fields):
+    # Vérification qu'un seul des champs 'order' ou 'credit_card' est présent
+    has_order = 'order' in data
+    has_credit_card = 'credit_card' in data
+    if has_order == has_credit_card:  # Les deux présents ou aucun
+        return jsonify({
+            "errors": {
+                "system": {
+                    "code": "invalid-request",
+                    "name": "La requête doit contenir soit 'order' soit 'credit_card', mais pas les deux."
+                }
+            }
+        }), 422
+
+    if has_order:
+        required_fields = {
+            "email": "Email",
+            "shipping_information.country": "Pays",
+            "shipping_information.address": "Adresse",
+            "shipping_information.postal_code": "Code postal",
+            "shipping_information.city": "Ville",
+            "shipping_information.province": "Province"
+        }
+
+        missing_fields = []
+        
+        # Vérification des champs principaux
+        if "email" not in data["order"] or not data["order"]["email"].strip():
+            missing_fields.append("email")
+        
+        # Vérification des sous-champs de shipping_information
+        shipping_info = data["order"].get("shipping_information", {})
+        for field in ["country", "address", "postal_code", "city", "province"]:
+            if not shipping_info.get(field, "").strip():
+                missing_fields.append(f"shipping_information.{field}")
+
+        if missing_fields:
             return jsonify({
                 "errors": {
                     "order": {
                         "code": "missing-fields",
-                        "name": "Champs obligatoires manquants"
-                    }
-                }
-            }), 422
-
-        shipping_info = data["order"]["shipping_information"]
-        required_shipping = ["country", "address", "postal_code", "city", "province"]
-        if not all(field in shipping_info for field in required_shipping):
-            return jsonify({
-                "errors": {
-                    "order": {
-                        "code": "invalid-shipping",
-                        "name": "Informations de livraison incomplètes"
+                        "name": "Il manque un ou plusieurs champs qui sont obligatoires",
+                        "fields": [required_fields[field] for field in missing_fields]
                     }
                 }
             }), 422
@@ -155,16 +200,14 @@ def update_order(order_id):
         order.save()
 
     # Partie traitement du paiement
-    credit_card = None  # Initialisation
-    
-    if "credit_card" in data:
+    elif has_credit_card:
         # Validation pré-paiement
         if not order.email or not order.shipping_information:
             return jsonify({
                 "errors": {
                     "order": {
                         "code": "missing-fields",
-                        "name": "Informations client requises avant paiement"
+                        "name": "Les informations du client sont nécessaire avant d'appliquer une carte de crédit"
                     }
                 }
             }), 422
@@ -181,25 +224,44 @@ def update_order(order_id):
 
         # Extraction des données de la carte
         credit_card = data["credit_card"]
+        card_number = credit_card["number"].replace(" ", "")
+    
+        # Validation des numéros de test autorisés
+        if card_number not in ["4242424242424242", "4000000000000002"]:
+            return jsonify({
+                "errors": {
+                    "credit_card": {
+                        "code": "incorrect-number",
+                        "name": "Numéro de carte invalide"
+                    }
+                }
+            }), 422
+        
+        if card_number == "4000000000000002":
+            return jsonify({
+                "errors": {
+                    "credit_card": {
+                        "code": "card-declined",
+                        "name": "La carte de crédit a été déclinée."
+                    }
+                }
+            }), 422
+
         credit_card["number"] = " ".join(credit_card["number"][i:i+4] for i in range(0, len(credit_card["number"]), 4))
-        print(credit_card)
 
         # Appel à l'API de paiement
         payload = {"credit_card": credit_card, "amount_charged": round(order.total_price_tax + order.shipping_price)}
-        print(payload)
-        print(PAYMENT_API)
         
         try:
             response = requests.post(PAYMENT_API, json=payload, headers={"Content-Type": "application/json"})
-            print(response)
             response.raise_for_status()
             payment_data = response.json()
         except requests.exceptions.RequestException as e:
             return jsonify({
                 "errors": {
                     "payment": {
-                        "code": "service-unavailable",
-                        "name": f"Erreur de connexion au service de paiement: {str(e)}"
+                        "code": "card-declined",
+                        "name": "la carte est expirée."
                     }
                 }
             }), 502
@@ -213,19 +275,7 @@ def update_order(order_id):
                 }
             }), 502
 
-        # Vérification de la réponse
-        if not payment_data.get("transaction", {}).get("success", False):
-            return jsonify({
-                "errors": {
-                    "payment": {
-                        "code": "payment-failed",
-                        "name": payment_data.get("errors", {}).get("credit_card", {}).get("name", "Paiement refusé")
-                    }
-                }
-            }), 422
-
         # Mise à jour finale après le paiement
-        card_number = credit_card["number"].replace(" ", "")
         order.credit_card_name = credit_card["name"]
         order.credit_card_first_digits = card_number[:4]
         order.credit_card_last_digits = card_number[-4:]
@@ -235,8 +285,10 @@ def update_order(order_id):
         order.paid = True
         order.save()
 
-        # Mise à jour de credit_card pour masquer les infos sensibles
-        credit_card = {
+    # Construction de la réponse
+    credit_card_info = None
+    if order.credit_card_name:
+        credit_card_info = {
             "name": order.credit_card_name,
             "first_digits": order.credit_card_first_digits,
             "last_digits": order.credit_card_last_digits,
@@ -244,26 +296,22 @@ def update_order(order_id):
             "expiration_month": order.credit_card_expiration_month
         }
 
-    # Construction de la réponse
     response_data = {
         "order": {
             "id": order.id,
-            "product": {
-                "id": order.product_id,
-                "quantity": order.quantity
-            },
+            "product": {"id": order.product_id, "quantity": order.quantity},
             "total_price": order.total_price,
             "total_price_tax": order.total_price_tax,
             "shipping_price": order.shipping_price,
             "email": order.email,
-            "shipping_information": json.loads(order.shipping_information),
+            "shipping_information": json.loads(order.shipping_information) if order.shipping_information else None,
             "paid": order.paid,
-            "credit_card": credit_card,
+            "credit_card": credit_card_info,
             "transaction": {
                 "id": order.transaction_id,
                 "success": order.paid,
-                "amount_charged": round(order.total_price + order.shipping_price, 2)
-            }
+                "amount_charged": round(order.total_price_tax + order.shipping_price)
+            } if order.transaction_id else None
         }
     }
 

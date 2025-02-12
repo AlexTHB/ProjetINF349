@@ -4,93 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boutique en ligne</title>
-    <style>
-        /* Styles existants */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        form { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        input, select { width: 100%; padding: 8px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .error { color: #dc3545; margin-top: 5px; }
-        .success { color: #28a745; margin-top: 5px; }
-        .expiry-cvv { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    </style>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
     <h1>Passer une commande</h1>
-    
+    <div class="form-section">
     <!-- Formulaire de commande -->
     <form id="orderForm">
         <h2>Nouvelle commande</h2>
-        <label>ID Produit: <input type="number" id="productId" required></label>
-        <label>Quantité: <input type="number" id="quantity" min="1" required></label>
+        <label>ID Produit: <input type="number" id="productId" ></label>
+        <label>Quantité: <input type="number" id="quantity" ></label>
         <button type="submit">Créer commande</button>
     </form>
 
-    <!-- Formulaire de mise à jour -->
-    <form id="updateForm">
-        <h2>Mettre à jour la commande</h2>
-        <label>ID Commande: <input type="number" id="orderId" required></label>
-        
-        <h3>Informations client</h3>
-        <label>Email: <input type="email" id="email" required></label>
-        <label>Pays: <input type="text" id="country" required></label>
-        <label>Adresse: <input type="text" id="address" required></label>
-        <label>Code postal: <input type="text" id="postalCode" required></label>
-        <label>Ville: <input type="text" id="city" required></label>
-        <label>Province: 
-            <select id="province" required>
-                <option value="QC">Québec</option>
-                <option value="ON">Ontario</option>
-                <option value="AB">Alberta</option>
-                <option value="BC">Colombie-Britannique</option>
-                <option value="NS">Nouvelle-Écosse</option>
-            </select>
-        </label>
+    
+        <!-- Formulaire d'informations client -->
+        <form id="shippingForm">
+            <h2>Mettre à jour les informations client</h2>
+            <label>ID Commande: <input type="number" id="orderId" required></label>
+            
+            <h3>Informations client</h3>
+            <label>Email: <input type="email" id="email" ></label>
+            <label>Pays: <input type="text" id="country" ></label>
+            <label>Adresse: <input type="text" id="address" ></label>
+            <label>Code postal: <input type="text" id="postalCode" ></label>
+            <label>Ville: <input type="text" id="city" ></label>
+            <label>Province: 
+                <select id="province" required>
+                    <option value="QC">Québec</option>
+                    <option value="ON">Ontario</option>
+                    <option value="AB">Alberta</option>
+                    <option value="BC">Colombie-Britannique</option>
+                    <option value="NS">Nouvelle-Écosse</option>
+                </select>
+            </label>
+            
+            <button type="submit">Mettre à jour les informations</button>
+        </form>
 
-        <h3>Paiement</h3>
-        <label>Nom sur la carte: <input type="text" id="cardName" required></label>
-        <label>Numéro de carte: <input type="text" id="cardNumber" 
-               pattern="\d{4} \d{4} \d{4} \d{4}" 
-               placeholder="4242 4242 4242 4242" required></label>
-        <div class="expiry-cvv">
-            <div>
-                <label>Année expiration: 
-                    <select id="expYear" required>
-                        <option value="2024">2024</option>
-                        <option value="2025">2025</option>
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                        <option value="2028">2028</option>
-                        <option value="2029">2029</option>
-                    </select>
-                </label>
+        <!-- Formulaire de paiement -->
+        <form id="paymentForm">
+            <h2>Paiement de la commande</h2>
+            <label>ID Commande: <input type="number" id="paymentOrderId" required></label>
+            
+            <h3>Informations de paiement</h3>
+            <label>Nom sur la carte: <input type="text" id="cardName" required></label>
+            <label>Numéro de carte: <input type="text" id="cardNumber" 
+                   pattern="\d{4} \d{4} \d{4} \d{4}" 
+                   placeholder="4242 4242 4242 4242" required></label>
+            <div class="expiry-cvv">
+                <div>
+                    <label>Année expiration: 
+                        <select id="expYear" required>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label>Mois expiration: 
+                        <select id="expMonth" required>
+                            <option value="1">01</option>
+                            <option value="2">02</option>
+                            <option value="3">03</option>
+                            <option value="4">04</option>
+                            <option value="5">05</option>
+                            <option value="6">06</option>
+                            <option value="7">07</option>
+                            <option value="8">08</option>
+                            <option value="9">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label>CVV: <input type="text" id="cvv" pattern="\d{3}" placeholder="xxx" required></label>
+                </div>
             </div>
-            <div>
-                <label>CVV: <input type="text" id="cvv" pattern="\d{3}" required></label>
-            </div>
-            <div>
-                <label>Mois expiration: 
-                    <select id="expMonth" required>
-                        <option value="1">01</option>
-                        <option value="2">02</option>
-                        <option value="3">03</option>
-                        <option value="4">04</option>
-                        <option value="5">05</option>
-                        <option value="6">06</option>
-                        <option value="7">07</option>
-                        <option value="8">08</option>
-                        <option value="9">09</option>
-                        <option value="10">10</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                    </select>
-                </label>
-            </div>
-        </div>
-        
-        <button type="submit">Mettre à jour et payer</button>
-    </form>
+            
+            <button type="submit">Procéder au paiement</button>
+        </form>
+    </div>
 
     <div id="response"></div>
 
@@ -118,7 +118,8 @@
             handleResponse(await response.json());
         });
 
-        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+        // Soumission des informations client
+        document.getElementById('shippingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const orderId = document.getElementById('orderId').value;
             const response = await fetch(`/order/${orderId}`, {
@@ -134,7 +135,20 @@
                             city: document.getElementById('city').value,
                             province: document.getElementById('province').value
                         }
-                    },
+                    }
+                })
+            });
+            handleResponse(await response.json());
+        });
+
+        // Soumission du paiement
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const orderId = document.getElementById('paymentOrderId').value;
+            const response = await fetch(`/order/${orderId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
                     credit_card: {
                         name: document.getElementById('cardName').value,
                         number: document.getElementById('cardNumber').value.replace(/ /g, ''),

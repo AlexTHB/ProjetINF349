@@ -1,110 +1,192 @@
-/* Style général */
+:root {
+    --feuille: #88C057;
+    --mousse: #4A7856;
+    --eau: #2D5D73;
+    --terre: #6B4E3C;
+    --tronc: #A68A64;
+    --fond: #F5F9EE;
+    --texte: #2D3321;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    padding: 0;
-    background-color: #f4f4f4;
-    text-align: center;
-}
-
-/* Titre */
-h1 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-/* Conteneur des produits */
-.product-container {
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 2rem;
+    background: var(--fond);
+    color: var(--texte);
+    line-height: 1.6;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Carte produit */
-.product-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    width: 250px;
+.container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
     text-align: center;
-    transition: transform 0.3s ease-in-out;
+    color: var(--mousse);
+    margin: 2rem 0;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    padding-bottom: 1rem;
 }
 
-.product-card:hover {
-    transform: scale(1.05);
+h1::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: var(--feuille);
 }
 
-/* Image produit */
-.product-card img {
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
     width: 100%;
-    height: auto;
-    border-radius: 5px;
+    max-width: 600px;
 }
 
-/* Nom produit */
-.product-card h2 {
-    font-size: 18px;
-    color: #333;
-    margin: 10px 0;
+#orderForm,
+#shippingForm,
+#paymentForm {
+    background: linear-gradient(145deg, #FFFFFF 0%, var(--fond) 100%);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 5px 5px 15px rgba(77, 87, 45, 0.1);
+    border: 2px solid var(--feuille);
+    overflow: hidden;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    box-sizing: border-box;
 }
 
-/* Description produit */
-.product-card p {
-    font-size: 14px;
-    color: #666;
-}
-
-/* Style du formulaire de commande */
-form {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+form h2 {
+    color: var(--eau);
+    margin: 0 0 1.5rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--tronc);
     display: inline-block;
-    text-align: left;
-    max-width: 400px;
-    width: 100%;
-    margin-top: 20px;
 }
 
-/* Champs du formulaire */
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
 label {
     display: block;
-    font-weight: bold;
-    margin: 10px 0 5px;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    color: var(--mousse);
+    font-size: 0.9rem;
 }
 
-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-/* Bouton de commande */
+input,
+select,
 button {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 15px;
     width: 100%;
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    margin: 0.5rem 0;
+}
+
+input,
+select {
+    border: 2px solid var(--tronc);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--feuille);
+    box-shadow: 0 0 0 3px rgba(136, 192, 87, 0.2);
+}
+
+button {
+    background: var(--feuille);
+    color: var(--texte);
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.8rem 1.5rem;
 }
 
 button:hover {
-    background-color: #218838;
+    background: var(--mousse);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(74, 120, 86, 0.3);
 }
 
-/* Message de réponse de commande */
-#orderResponse {
-    margin-top: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
+.expiry-cvv {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+.expiry-cvv > div {
+    width: 100%;
+}
+
+#response {
+    margin: 2rem auto;
+    padding: 1.2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.success {
+    background: rgba(136, 192, 87, 0.15);
+    color: var(--mousse);
+    border: 2px solid var(--feuille);
+}
+
+.error {
+    background: rgba(173, 63, 63, 0.15);
+    color: #AD3F3F;
+    border: 2px solid #AD3F3F;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    #orderForm,
+    #shippingForm,
+    #paymentForm {
+        padding: 1.5rem;
+    }
+    
+    .expiry-cvv {
+        grid-template-columns: 1fr;
+    }
+}
+
+@keyframes jump {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
 }
