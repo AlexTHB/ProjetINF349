@@ -1,30 +1,44 @@
 import pytest
-import sys
-import os
+from peewee import SqliteDatabase
 from app import app
-from models import db, Product, Order
+from models import Product, Order
 
-# Ajouter le dossier parent au chemin d'import
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-@pytest.fixture
-def client():
-    """Client Flask pour les tests"""
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
-
-@pytest.fixture
-def init_database():
-    """Création d'une base SQLite en mémoire pour les tests"""
-    db.init(':memory:')  # Base temporaire
+@pytest.fixture(scope='session')
+def test_database():
+    """Configurer une base de données SQLite en mémoire pour les tests."""
+    
+    db = SqliteDatabase(':memory:')
+    db.bind([Product, Order])
     db.connect()
     db.create_tables([Product, Order])
+    
+    # Insérer un produit de test dans la base de données.
+    Product.create(
+        id=1,
+        name="Laptop",
+        price=1000,
+        weight=2000,
+        in_stock=True,
+        description="Un bon PC",
+        image="laptop.jpg"
+    )
+    
+    yield db  # Fournir la base de données pour les tests.
+    
+    db.drop_tables([Product, Order])  # Nettoyer les tables après les tests.
+    db.close()  # Fermer la connexion à la base de données.
 
-    # Ajouter un produit de test
-    Product.create(id=1, name="Laptop", description="Un bon PC", price=1000, weight=2000, in_stock=True, image="laptop.jpg")
+@pytest.fixture
+def client(test_database):
+    """Créer un client de test Flask pour tester l'API."""
+    
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client  # Retourner le client de test à utiliser dans les tests.
 
-    yield db  # Permet d'utiliser cette base pour les tests
-
-    db.drop_tables([Product, Order])
-    db.close()
+@pytest.fixture
+def empty_order(client):
+    """Créer une commande par défaut pour les tests."""
+    
+    order = Order.create(product_id=1, quantity=1)  # Créer une commande d'exemple.
+    return order  # Retourner la commande créée.

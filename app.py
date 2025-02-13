@@ -50,7 +50,19 @@ def create_order():
     if not product.in_stock:
         return jsonify({"errors": {"product": {"code": "out-of-inventory", "name": "Le produit demandé n'est pas en inventaire"}}}), 422
     
-    if data["product"]["quantity"] < 1:
+    try:
+        quantity = int(data["product"]["quantity"])
+    except (ValueError, TypeError):
+        return jsonify({
+            "errors": {
+                "product": {
+                    "code": "invalid-quantity",
+                    "name": "La quantité doit être un nombre entier"
+                }
+            }
+        }), 422
+    
+    if quantity < 1 :
         return jsonify({"errors": {"product": {"code": "missing-fields", "name": "La quantite doit etre superieure ou egal a 1"}}}), 422
 
     order = Order.create(
@@ -269,8 +281,18 @@ def update_order(order_id):
             return jsonify({
                 "errors": {
                     "payment": {
-                        "code": "invalid-response",
+                        "code": "card-declined",
                         "name": "Réponse invalide du processeur de paiement"
+                    }
+                }
+            }), 502
+
+        if "transaction" not in payment_data:
+            return jsonify({
+                "errors": {
+                    "payment": {
+                        "code": "card-declined",
+                        "name": "La transaction n'a pas été enregistrée."
                     }
                 }
             }), 502
