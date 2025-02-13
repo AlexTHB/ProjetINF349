@@ -1,6 +1,6 @@
 import pytest
 
-# 🔹 Données partagées (facteurisation)
+# Données partagées (facteurisation)
 VALID_SHIPPING_DATA = {
     "order": {
         "email": "client@example.com",
@@ -23,7 +23,7 @@ INCOMPLETE_SHIPPING_DATA = {
     }
 }
 
-# 🔹 Fixture pour créer une commande
+# Fixture pour créer une commande
 @pytest.fixture
 def created_order(client):
     """Crée une commande et retourne son ID."""
@@ -31,7 +31,7 @@ def created_order(client):
     assert response.status_code == 302
     return int(response.headers["Location"].split("/")[-1])
 
-# 🔹 Test : Mise à jour des infos de livraison
+# Test : Mise à jour des infos de livraison
 def test_update_order_with_shipping_info(client, created_order):
     """Test de mise à jour d'une commande avec les informations de livraison."""
     response = client.put(f"/order/{created_order}", json=VALID_SHIPPING_DATA)
@@ -42,7 +42,7 @@ def test_update_order_with_shipping_info(client, created_order):
     assert updated_order["email"] == VALID_SHIPPING_DATA["order"]["email"]
     assert updated_order["shipping_information"] == VALID_SHIPPING_DATA["order"]["shipping_information"]
 
-# 🔹 Test : Mise à jour avec des champs manquants
+# Test : Mise à jour avec des champs manquants
 def test_update_order_missing_fields(client, created_order):
     """Test mise à jour d'une commande avec des champs manquants."""
     response = client.put(f"/order/{created_order}", json=INCOMPLETE_SHIPPING_DATA)
