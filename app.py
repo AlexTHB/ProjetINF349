@@ -4,6 +4,8 @@ from peewee import DoesNotExist
 import requests
 from collections import OrderedDict
 import json
+from flask.cli import with_appcontext
+import click
 
 app = Flask(__name__)
 API_URL = "http://dimensweb.uqac.ca/~jgnault/shops/products/"
@@ -19,7 +21,12 @@ def init_db():
             Product.create(**p)
     db.close()
 
-init_db()
+@app.cli.command("init-db")
+@with_appcontext
+def initialize_database():
+    """Initialise la base de données."""
+    init_db()
+    click.echo("Base de données initialisée.")
 
 def calculate_shipping(weight):
     if weight <= 500: return 500
