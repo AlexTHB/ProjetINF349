@@ -1,9 +1,3 @@
-[![Python][Python-badge]][Python-url]
-[![Flask][Flask-badge]][Flask-url]
-[![Peewee][Peewee-badge]][Peewee-url]
-[![SQLite][SQLite-badge]][SQLite-url]
-[![Pytest][Pytest-badge]][Pytest-url]
-
 # Projet INF349
 
 ## Table des matières
@@ -31,10 +25,10 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 *Exemple d'interface (remplacer par une vraie capture)*
 
 ## Construit avec
-- **Backend** : [Python 3.11](https://www.python.org/) + [Flask](https://flask.palletsprojects.com/)
-- **ORM** : [Peewee](http://docs.peewee-orm.com/)
-- **Base de données** : [SQLite](https://www.sqlite.org/)
-- **Tests** : [Pytest](https://docs.pytest.org/)
+- **Backend** : [![Python][Python]][Python-url] + [![Flask][Flask]][Flask-url]
+- **ORM** : [![Peewee][Peewee]][Peewee-url]
+- **Base de données** : [![SQLite][SQLite-badge]][SQLite-url]
+- **Tests** : [![Pytest][Pytest]][Pytest-url]
 - **Services externes** :
   - 📦 API Produits : `http://dimensweb.uqac.ca/~jgnault/shops/products/`
   - 💸 API Paiement : `http://dimensweb.uqac.ca/~ignault/shops/pay/`
@@ -86,3 +80,13 @@ pytest
 ```
 
 ## Demo
+
+
+
+
+
+[Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
+[Flask]: https://img.shields.io/badge/Flask-000?logo=flask&logoColor=fff
+[Peewee]: https://docs.peewee-orm.com/en/latest/_images/peewee3-logo.png
+[SQLite]: https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white
+[Pytest]: https://img.shields.io/badge/Pytest-0A9EDC?logo=pytest
