@@ -3,6 +3,7 @@
 [![Peewee][Peewee-badge]][Peewee-url]
 [![SQLite][SQLite-badge]][SQLite-url]
 [![Pytest][Pytest-badge]][Pytest-url]
+[![Vue][Vue.js]][Vue-url]
 
 # Projet INF349
 
