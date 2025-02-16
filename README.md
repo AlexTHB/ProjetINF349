@@ -25,10 +25,10 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 *Exemple d'interface (remplacer par une vraie capture)*
 
 ## Construit avec
-- **Backend** : [![Python]Python] + [![Flask]Flask]
+- **Backend** : ![Python] + ![Flask]
 - **ORM** : Peewee
-- **Base de données** : [![SQLite]SQLite-badge]
-- **Tests** : [![Pytest]Pytest]
+- **Base de données** : SQLite
+- **Tests** : ![Pytest]
 - **Services externes** :
   - 📦 API Produits : `http://dimensweb.uqac.ca/~jgnault/shops/products/`
   - 💸 API Paiement : `http://dimensweb.uqac.ca/~ignault/shops/pay/`
