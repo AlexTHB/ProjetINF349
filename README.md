@@ -25,10 +25,10 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 *Exemple d'interface (remplacer par une vraie capture)*
 
 ## Construit avec
-- **Backend** : [![Python][Python]][Python-url] + [![Flask][Flask]][Flask-url]
-- **ORM** : [![Peewee][Peewee]][Peewee-url]
-- **Base de données** : [![SQLite][SQLite-badge]][SQLite-url]
-- **Tests** : [![Pytest][Pytest]][Pytest-url]
+- **Backend** : [![Python]Python] + [![Flask]Flask]
+- **ORM** : Peewee
+- **Base de données** : [![SQLite]SQLite-badge]
+- **Tests** : [![Pytest]Pytest]
 - **Services externes** :
   - 📦 API Produits : `http://dimensweb.uqac.ca/~jgnault/shops/products/`
   - 💸 API Paiement : `http://dimensweb.uqac.ca/~ignault/shops/pay/`
@@ -87,6 +87,4 @@ pytest
 
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
 [Flask]: https://img.shields.io/badge/Flask-000?logo=flask&logoColor=fff
-[Peewee]: https://docs.peewee-orm.com/en/latest/_images/peewee3-logo.png
-[SQLite]: https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white
 [Pytest]: https://img.shields.io/badge/Pytest-0A9EDC?logo=pytest
