@@ -27,7 +27,7 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 ## Construit avec
 - **Backend** : ![Python] + ![Flask]
 - **ORM** : Peewee
-- **Base de données** : SQLite
+- **Base de données** : ![SQLite]
 - **Tests** : ![Pytest]
 - **Services externes** :
   - 📦 API Produits : `http://dimensweb.uqac.ca/~jgnault/shops/products/`
@@ -84,7 +84,7 @@ pytest
 
 
 
-
+[SQLite]: https://img.shields.io/badge/SQLite-000?logo=sqlite&logoColor=white
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
 [Flask]: https://img.shields.io/badge/Flask-fff?logo=flask&logoColor=000
 [Pytest]: https://img.shields.io/badge/Pytest-222?logo=pytest
