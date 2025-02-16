@@ -22,7 +22,9 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 ## Site web
 
 ![Interface utilisateur](images/form1.PNG)  
-*Exemple d'interface (remplacer par une vraie capture)*
+![Interface utilisateur](images/form2PNG.PNG)  
+![Interface utilisateur](images/form3.PNG)  
+![Interface utilisateur](images/form1.PNG)  
 
 ## Construit avec
 - **Backend** : ![Python] + ![Flask]
