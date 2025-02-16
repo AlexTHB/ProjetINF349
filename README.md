@@ -14,8 +14,8 @@ Ce projet a pour objectif de développer une application web de gestion des comm
 
 L’accent est mis sur la performance, la résilience et la fiabilité du système, en respectant les bonnes pratiques du développement web. Le projet se déroule en deux phases :
 
-    Première remise : Développement de l’API REST pour gérer les commandes et récupérer les produits.
-    Remise finale : Ajout des fonctionnalités de paiement, gestion des transactions et intégration des taxes et frais d’expédition.
+Première remise : Développement de l’API REST pour gérer les commandes et récupérer les produits.
+Remise finale : Ajout des fonctionnalités de paiement, gestion des transactions et intégration des taxes et frais d’expédition.
 
 L’application utilise une base de données SQLite avec l’ORM Peewee et doit être déployée en respectant les exigences techniques imposées. Une attention particulière est portée à la qualité du code, aux tests unitaires et à la sécurité des transactions.
 
@@ -25,10 +25,10 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 *Exemple d'interface (remplacer par une vraie capture)*
 
 ## Construit avec
-- **Backend** : [![Python][Python]][Python-url] + [![Flask][Flask]][Flask-url]
-- **ORM** : [![Peewee][Peewee]][Peewee-url]
-- **Base de données** : [![SQLite][SQLite-badge]][SQLite-url]
-- **Tests** : [![Pytest][Pytest]][Pytest-url]
+- **Backend** : ![Python] + ![Flask]
+- **ORM** : ![Peewee]
+- **Base de données** : ![SQLite]
+- **Tests** : ![Pytest]
 - **Services externes** :
   - 📦 API Produits : `http://dimensweb.uqac.ca/~jgnault/shops/products/`
   - 💸 API Paiement : `http://dimensweb.uqac.ca/~ignault/shops/pay/`
@@ -83,10 +83,8 @@ pytest
 
 
 
-
-
+[Peewee]: https://img.shields.io/badge/Peewee-FF9900?logo=bitcoin&logoColor=white
+[SQLite]: https://img.shields.io/badge/SQLite-25A768?logo=sqlite&logoColor=white
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
-[Flask]: https://img.shields.io/badge/Flask-000?logo=flask&logoColor=fff
-[Peewee]: https://docs.peewee-orm.com/en/latest/_images/peewee3-logo.png
-[SQLite]: https://img.shields.io/badge/SQLite-%2307405e.svg?logo=sqlite&logoColor=white
-[Pytest]: https://img.shields.io/badge/Pytest-0A9EDC?logo=pytest
+[Flask]: https://img.shields.io/badge/Flask-fff?logo=flask&logoColor=000
+[Pytest]: https://img.shields.io/badge/Pytest-222?logo=pytest
