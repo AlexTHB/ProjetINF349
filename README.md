@@ -86,5 +86,5 @@ pytest
 
 
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
-[Flask]: https://img.shields.io/badge/Flask-000?logo=flask&logoColor=fff
+[Flask]: https://img.shields.io/badge/Flask-fff?logo=flask&logoColor=000
 [Pytest]: https://img.shields.io/badge/Pytest-222?logo=pytest
