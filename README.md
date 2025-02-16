@@ -84,7 +84,7 @@ pytest
 
 
 [Peewee]: https://img.shields.io/badge/Peewee-FF9900?logo=bitcoin&logoColor=white
-[SQLite]: https://img.shields.io/badge/SQLite-000?logo=sqlite&logoColor=white
+[SQLite]: https://img.shields.io/badge/SQLite-25A768?logo=sqlite&logoColor=white
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
 [Flask]: https://img.shields.io/badge/Flask-fff?logo=flask&logoColor=000
 [Pytest]: https://img.shields.io/badge/Pytest-222?logo=pytest
