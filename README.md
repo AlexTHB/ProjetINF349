@@ -26,7 +26,7 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 
 ## Construit avec
 - **Backend** : ![Python] + ![Flask]
-- **ORM** : Peewee
+- **ORM** : ![Peewee]
 - **Base de données** : ![SQLite]
 - **Tests** : ![Pytest]
 - **Services externes** :
@@ -83,7 +83,7 @@ pytest
 
 
 
-
+[Peewee]: https://img.shields.io/badge/Peewee-000?logo=sqlite&logoColor=white
 [SQLite]: https://img.shields.io/badge/SQLite-000?logo=sqlite&logoColor=white
 [Python]: https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff
 [Flask]: https://img.shields.io/badge/Flask-fff?logo=flask&logoColor=000
