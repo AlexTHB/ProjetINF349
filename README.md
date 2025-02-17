@@ -21,17 +21,13 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 
 ## Site web
 
-1. Page d'accueil
-  URL : http://localhost:5000
+1. Page d'accueil : http://localhost:5000
 ![Interface utilisateur](images/pageweb.PNG)
-2. Liste des produits JSON
-  URL : http://localhost:5000/products
+2. Liste des produits JSON : http://localhost:5000/products
 ![Interface utilisateur](images/products.PNG)
-3. Commande initialisée JSON
-  URL : http://localhost:5000/order/1
+3. Commande initialisée JSON : http://localhost:5000/order/1
 ![Interface utilisateur](images/ordercreated.PNG)
-5. Paiement finalisé JSON
-  URL : http://localhost:5000/order/1 
+5. Paiement finalisé JSON : http://localhost:5000/order/1 
 ![Interface utilisateur](images/payement.PNG)  
 
 ## Construit avec
