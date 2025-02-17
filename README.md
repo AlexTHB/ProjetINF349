@@ -7,7 +7,7 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Exécution des tests](#exécution-des-tests)
-- [Démo](#démo)
+
 
 ## Introduction
 Ce projet a pour objectif de développer une application web de gestion des commandes et des paiements en ligne en utilisant Python (Flask). L’application repose sur une API REST permettant d’afficher les produits disponibles, de créer et gérer des commandes, ainsi que de traiter les paiements via un service externe.
@@ -82,10 +82,11 @@ L'application sera accessible à l'adresse : http://localhost:5000
 Pour vérifier le bon fonctionnement du projet, lancez les tests avec :
 
 ```bash
-pytest
+cd chemin/vers/votre/projet
+python -m pytest -v tests/v
 ```
 
-## Demo
+
 
 
 
