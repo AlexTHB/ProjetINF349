@@ -7,7 +7,7 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Exécution des tests](#exécution-des-tests)
-- [Démo](#démo)
+
 
 ## Introduction
 Ce projet a pour objectif de développer une application web de gestion des commandes et des paiements en ligne en utilisant Python (Flask). L’application repose sur une API REST permettant d’afficher les produits disponibles, de créer et gérer des commandes, ainsi que de traiter les paiements via un service externe.
@@ -21,8 +21,14 @@ L’application utilise une base de données SQLite avec l’ORM Peewee et doit 
 
 ## Site web
 
-![Interface utilisateur](https://via.placeholder.com/800x400.png?text=Capture+d'écran+du+projet)  
-*Exemple d'interface (remplacer par une vraie capture)*
+1. Page d'accueil : http://localhost:5000
+![Interface utilisateur](images/pageweb.PNG)
+2. Liste des produits JSON : http://localhost:5000/products
+![Interface utilisateur](images/products.PNG)
+3. Commande initialisée JSON : http://localhost:5000/order/1
+![Interface utilisateur](images/ordercreated.PNG)
+5. Paiement finalisé JSON : http://localhost:5000/order/1 
+![Interface utilisateur](images/payement.PNG)  
 
 ## Construit avec
 - **Backend** : ![Python] + ![Flask]
@@ -76,10 +82,11 @@ L'application sera accessible à l'adresse : http://localhost:5000
 Pour vérifier le bon fonctionnement du projet, lancez les tests avec :
 
 ```bash
-pytest
+cd chemin/vers/votre/projet
+python -m pytest -v tests/v
 ```
 
-## Demo
+
 
 
 

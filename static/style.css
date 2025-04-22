@@ -168,6 +168,40 @@ button:hover {
     color: #AD3F3F;
     border: 2px solid #AD3F3F;
 }
+.product-group {
+    position: relative;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--tronc);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.removeProduct {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #ff4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0;
+    line-height: 1;
+}
+
+#addProduct {
+    margin-bottom: 1rem;
+    background: var(--eau);
+    width: auto;
+}
+
+#addProduct:hover {
+    background: var(--mousse);
+}
 
 @media (max-width: 768px) {
     body {

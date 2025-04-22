@@ -1,0 +1,6 @@
+flask
+peewee
+psycopg2-binary  # Ajouter cette dépendance pour PostgreSQL
+requests
+redis
+rq

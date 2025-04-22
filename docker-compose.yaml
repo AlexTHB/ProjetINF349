@@ -1,0 +1,53 @@
+services:
+  web:
+    build: .
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=True
+      - DB_HOST=postgres
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=api8inf349
+      - DB_PORT=5432
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+      - redis
+
+
+  worker:
+    build: .
+    command: flask worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=True
+      - DB_HOST=postgres
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=api8inf349
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: api8inf349
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:5
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

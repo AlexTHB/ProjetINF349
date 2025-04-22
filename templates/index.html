@@ -8,12 +8,15 @@
 </head>
 <body>
     <h1>Passer une commande</h1>
-    <div class="form-section">
-    <!-- Formulaire de commande -->
     <form id="orderForm">
         <h2>Nouvelle commande</h2>
-        <label>ID Produit: <input type="number" id="productId" ></label>
-        <label>Quantité: <input type="number" id="quantity" ></label>
+        <div id="productsContainer">
+            <div class="product-group">
+                <label>ID Produit: <input type="number" class="productId" required></label>
+                <label>Quantité: <input type="number" class="quantity" min="1" required></label>
+            </div>
+        </div>
+        <button type="button" id="addProduct">+ Ajouter un produit</button>
         <button type="submit">Créer commande</button>
     </form>
 
@@ -103,21 +106,50 @@
         });
 
         // Gestion des formulaires
+        // Gestion de l'ajout de produits
+        document.getElementById('addProduct').addEventListener('click', function() {
+            const newGroup = document.createElement('div');
+            newGroup.className = 'product-group';
+            newGroup.innerHTML = `
+                <label>ID Produit: <input type="number" class="productId" required></label>
+                <label>Quantité: <input type="number" class="quantity" min="1" required></label>
+                <button type="button" class="removeProduct">×</button>
+            `;
+            document.getElementById('productsContainer').appendChild(newGroup);
+        });
+
+        // Gestion de la suppression
+        document.getElementById('productsContainer').addEventListener('click', function(e) {
+            if(e.target.classList.contains('removeProduct')) {
+                e.target.parentElement.remove();
+            }
+        });
+
+        // Modifier la soumission du formulaire
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            const products = [];
+            document.querySelectorAll('.product-group').forEach(group => {
+                const productId = group.querySelector('.productId').value;
+                const quantity = group.querySelector('.quantity').value;
+                
+                if(productId && quantity) {
+                    products.push({
+                        id: parseInt(productId),
+                        quantity: parseInt(quantity)
+                    });
+                }
+            });
+
             const response = await fetch('/order', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    product: {
-                        id: parseInt(document.getElementById('productId').value),
-                        quantity: parseInt(document.getElementById('quantity').value)
-                    }
-                })
+                body: JSON.stringify({ products })
             });
+            
             handleResponse(await response.json());
         });
-
         // Soumission des informations client
         document.getElementById('shippingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -163,10 +195,29 @@
 
         function handleResponse(data) {
             const div = document.getElementById('response');
-            if(data.errors) {
-                div.innerHTML = `<div class="error">Erreur: ${JSON.stringify(data.errors)}</div>`;
-            } else {
-                div.innerHTML = `<div class="success">Succès: ${JSON.stringify(data.order, null, 2)}</div>`;
+            
+            // Gestion améliorée des erreurs
+            if(data?.errors) {
+                const errorMsg = data.errors[Object.keys(data.errors)[0]]?.name || JSON.stringify(data.errors);
+                div.innerHTML = `<div class="error">Erreur: ${errorMsg}</div>`;
+            } 
+            // Gestion des redirections (pour la création de commande)
+            else if(data?.order?.id) {
+                div.innerHTML = `
+                    <div class="success">
+                        Succès!<br>
+                        ID Commande: ${data.order.id}<br>
+                        <a href="/order/${data.order.id}" target="_blank">Voir la commande</a>
+                    </div>
+                `;
+            }
+            // Gestion des autres succès (mise à jour, paiement)
+            else if(data?.order) {
+                div.innerHTML = `<div class="success">${JSON.stringify(data.order, null, 2)}</div>`;
+            }
+            // Cas générique
+            else {
+                div.innerHTML = `<div class="success">Opération réussie!</div>`;
             }
         }
     </script>
