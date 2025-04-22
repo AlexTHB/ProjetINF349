@@ -1,6 +1,6 @@
 # Projet INF349
 
-Fait avec Konogan Godefroy et Alex Thiebot
+Fait avec Konogan Godefroy GODK28010400 et Alex Thiebot THIA22010400
 
 ## Table des matières
 - [Introduction](#introduction)
