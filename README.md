@@ -1,5 +1,7 @@
 # Projet INF349
 
+Fait avec Konogan Godefroy et Alex Thiebot
+
 ## Table des matières
 - [Introduction](#introduction)
 - [Site web](#site-web)
