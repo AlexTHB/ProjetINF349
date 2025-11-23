@@ -1,9 +1,3 @@
-# Projet INF349
-
-
-- Konogan Godefroy GODK28010400 
-- Alex Thiebot THIA22010400
-
 ## Table des matières
 - [Introduction](#introduction)
 - [Site web](#site-web)
